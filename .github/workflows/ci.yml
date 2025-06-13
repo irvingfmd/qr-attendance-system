@@ -3,12 +3,12 @@ name: CI
 on:
   push:
     branches:
-      - develop
       - main
+      - develop
   pull_request:
     branches:
-      - develop
       - main
+      - develop
 
 jobs:
   lint:
@@ -21,7 +21,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.9'  # usa la versión que prefieras
+          python-version: '3.9'  # Usa la versión de Python que prefieras
 
       - name: Install dependencies (Backend)
         run: |
@@ -38,7 +38,7 @@ jobs:
       - name: Install Node.js (Frontend)
         uses: actions/setup-node@v2
         with:
-          node-version: '16'  # o la versión que uses
+          node-version: '16'  # Usa la versión de Node.js que prefieras
 
       - name: Install dependencies (Frontend)
         run: |
@@ -50,24 +50,24 @@ jobs:
           cd frontend
           npm run lint
 
-      - name: Install Flutter
+      - name: Install Flutter (Mobile)
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.0.0'  # usa la versión que necesites
+          flutter-version: '3.0.0'  # Usa la versión de Flutter que necesites
 
       - name: Install dependencies (Mobile)
         run: |
           cd mobile
           flutter pub get
 
-      - name: Run Flutter Analyze
+      - name: Run Flutter Analyze (Mobile)
         run: |
           cd mobile
           flutter analyze
 
   tests:
     runs-on: ubuntu-latest
-    needs: lint
+    needs: lint  # Esto asegura que el job 'lint' debe completarse antes de 'tests'
 
     steps:
       - name: Check out code
@@ -83,7 +83,7 @@ jobs:
       - name: Run Tests (Backend)
         run: |
           cd backend
-          pytest  # Asegúrate de que tienes pytest instalado
+          pytest  # Asegúrate de tener pytest instalado
 
       - name: Install Node.js (Frontend)
         uses: actions/setup-node@v2
