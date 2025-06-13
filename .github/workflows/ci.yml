@@ -1,0 +1,116 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  pull_request:
+    branches:
+      - develop
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'  # usa la versión que prefieras
+
+      - name: Install dependencies (Backend)
+        run: |
+          cd backend
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Run Black (Backend)
+        run: |
+          cd backend
+          python -m black --check .
+
+      - name: Install Node.js (Frontend)
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'  # o la versión que uses
+
+      - name: Install dependencies (Frontend)
+        run: |
+          cd frontend
+          npm install
+
+      - name: Run ESLint + Prettier (Frontend)
+        run: |
+          cd frontend
+          npm run lint
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.0.0'  # usa la versión que necesites
+
+      - name: Install dependencies (Mobile)
+        run: |
+          cd mobile
+          flutter pub get
+
+      - name: Run Flutter Analyze
+        run: |
+          cd mobile
+          flutter analyze
+
+  tests:
+    runs-on: ubuntu-latest
+    needs: lint
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies (Backend)
+        run: |
+          cd backend
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Run Tests (Backend)
+        run: |
+          cd backend
+          pytest  # Asegúrate de que tienes pytest instalado
+
+      - name: Install Node.js (Frontend)
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install dependencies (Frontend)
+        run: |
+          cd frontend
+          npm install
+
+      - name: Run Tests (Frontend)
+        run: |
+          cd frontend
+          npm run test
+
+      - name: Install Flutter (Mobile)
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.0.0'
+
+      - name: Install dependencies (Mobile)
+        run: |
+          cd mobile
+          flutter pub get
+
+      - name: Run Tests (Mobile)
+        run: |
+          cd mobile
+          flutter test
